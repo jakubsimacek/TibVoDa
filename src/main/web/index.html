@@ -7,7 +7,9 @@
 </head>
 <body>
     <div id="main">
-        <multi-field></multi-field>
+        <field-panel :panel-data="panelData"></field-panel>
+        <bw-log-panel></bw-log-panel>
+        {{ result }}
     </div>
     <script src="https://unpkg.com/vue"></script>
     <script src="../js/TibVoDa.js"></script>
