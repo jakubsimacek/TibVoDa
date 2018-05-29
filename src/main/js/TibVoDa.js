@@ -9,24 +9,27 @@ const TextInput = {
     props: [ "input" ],
     methods: {
         clone: function() {
-            const inputs = this.$parent.inputs
-            const idx = inputs.indexOf(this.input)
-            if (idx >= 0)
-                inputs.splice(idx+1, 0, {
+            const _multiInputs = this.$parent.multiInputs
+            const _input = this.input
+            const _idx = _multiInputs.inputs.indexOf(_input)
+            if (_idx >= 0)
+                _multiInputs.inputs.splice(_idx+1, 0, {
                     id: Date.now(),
-                    operator: this.input.operator,
+                    operator: _input.operator,
                     textInput: TextInput,
-                    text: this.input.text,
-                    name: 'bwinstanceid'
+                    text: _input.text,
+                    name: _input.name,
+                    label: _input.label
                 })
             else
                 console.log("Cannot clone an input")
         },
         remove: function() {
-            const inputs = this.$parent.inputs
-            const idx = inputs.indexOf(this.input)
-            if (idx >= 0)
-                inputs.splice(idx, 1)
+            const _multiInputs = this.$parent.multiInputs
+            const _input = this.input
+            const _idx = _multiInputs.inputs.indexOf(_input)
+            if (_idx >= 0)
+                _multiInputs.inputs.splice(_idx, 1)
             else
                 console.log("Cannot remove an input")
         }
@@ -62,25 +65,19 @@ const MultiInput = {
             inputs: []
         }
     },*/
-    props: [ "inputs" ],
- /*   created: function() {
-        bus.$on('send', function (field) {
-            console.log(this)
-            //const idx = this.inputs.indexOf(field)
-            //if (idx >= 0)
-            this.inputs.splice(0)
-        })
-    }, */
+    props: [ "multiInputs" ],
     methods: {
         add: function () {
             //this.count++ //or this.count += 1
             //console.log('add clicked')
-            this.inputs.push({
+            const _multi = this.multiInputs
+            _multi.inputs.push({
                 id: Date.now(),
                 operator: 'equal',
                 textInput: TextInput,
                 text: '',
-                name: 'bwinstanceid'
+                name: _multi.name,
+                label: _multi.label
             })
         }
     },
@@ -89,16 +86,16 @@ const MultiInput = {
     },
     template: `
     <div>
-        <button @click="add">Add</button>
+        <button @click="add">Add { inputs.label }</button>
         <ul>
-            <li v-for="input in inputs" :key="input.id">
+            <li v-for="input in multiInputs.inputs" :key="input.id">
                 <text-input :input="input" ></text-input>
             </li>
         </ul>
     </div>`
 }
 
-const FieldPanel = {
+const BwFieldPanel = {
     props: [ "panelData" ],
     components: {
         'MultiInput': MultiInput
@@ -112,19 +109,28 @@ const FieldPanel = {
     <div>
         <span>
             <button @click="add">Add OR</button>
-            <input type="checkbox" :id="panelData.multiBwInstanceId.id" v-model="panelData.multiBwInstanceId.enabled">
-            <input type="checkbox" :id="panelData.multiOrderId.id" v-model="panelData.multiOrderId.enabled">
-            <input type="checkbox" :id="panelData.multiEngineName.id" v-model="panelData.multiEngineName.enabled">
+            <label :for="panelData.multiBwInstanceId.id">
+                <input type="checkbox" :name="panelData.multiBwInstanceId.id" v-model="panelData.multiBwInstanceId.enabled">
+                Bw Instance Id
+            </label>
+            <label :for="panelData.multiOrderId.id">
+                <input type="checkbox" :id="panelData.multiOrderId.id" v-model="panelData.multiOrderId.enabled">
+                Order Id
+            </label>
+            <label :for="panelData.multiEngineName.id">
+                <input type="checkbox" :id="panelData.multiEngineName.id" v-model="panelData.multiEngineName.enabled">
+                Engine name
+            </label>
         </span>
         <ul>
             <li v-if="panelData.multiBwInstanceId.enabled" :key="panelData.multiBwInstanceId.id">
-                <multi-input :input="panelData.multiBwInstanceId.inputs" ></multi-input>
+                <multi-input :multi-inputs="panelData.multiBwInstanceId" ></multi-input>
             </li>
             <li v-if="panelData.multiOrderId.enabled" :key="panelData.multiOrderId.id">
-                <multi-input :input="panelData.multiOrderId.inputs" ></multi-input>
+                <multi-input :multi-inputs="panelData.multiOrderId" ></multi-input>
             </li>
             <li v-if="panelData.multiEngineName.enabled" :key="panelData.multiEngineName.id">
-                <multi-input :input="panelData.multiEngineName.inputs" ></multi-input>
+                <multi-input :multi-inputs="panelData.multiEngineName" ></multi-input>
             </li>
         </ul>
     </div>`
@@ -152,31 +158,35 @@ const BwLogPanel = {
         </span>
     </div>`
 }
+
 //main instance
 const main = new Vue({
     el: "#main",
     data: {
-        panelData: {
+        bwPanelData: {
             multiBwInstanceId: {
                 enabled: false,
                 id: "multiBwInstanceId" + Date.now(),
-                inputs: []
+                inputs: [],
+                label: 'BW Instance Id'
             },
             multiOrderId: {
                 enabled: false,
                 id: "multiOrderId" + Date.now(),
-                inputs: []
+                inputs: [],
+                label: 'Order Id'
             },
             multiEngineName: {
                 enabled: false,
                 id: "multiEngineName" + Date.now(),
-                inputs: []
+                inputs: [],
+                label: 'Engine Name'
             }
         },
         result: ''
     },
     components: {
-        'FieldPanel': FieldPanel,
+        'BwFieldPanel': BwFieldPanel,
         'BwLogPanel': BwLogPanel
     }
 })
