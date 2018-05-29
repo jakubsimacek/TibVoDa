@@ -37,6 +37,7 @@ const TextInput = {
     template: `
     <div>
         <span>
+            {{ input.label }}
             <label :for="input.id + '_equal'">
                 = ...
                 <input type="radio" value="equal" :name="input.id + '_operator'" v-model="input.operator">
@@ -86,7 +87,7 @@ const MultiInput = {
     },
     template: `
     <div>
-        <button @click="add">Add { inputs.label }</button>
+        <button @click="add">Add {{ multiInputs.label }}</button>
         <ul>
             <li v-for="input in multiInputs.inputs" :key="input.id">
                 <text-input :input="input" ></text-input>
@@ -136,6 +137,21 @@ const BwFieldPanel = {
     </div>`
 }
 
+const MainPanel = {
+    props: [ "panels" ],
+    components: {
+        'BwFieldPanel': BwFieldPanel
+    },
+    template: `
+    <div>
+        <ul>
+            <li v-for="bwPanel in panels.bwPanels" :key="bwPanel.id">
+                <bw-field-panel :panel-data="bwPanel.panelData" ></bw-field-panel>
+            </li>
+        </ul>
+    </div>`
+}
+
 const BwLogPanel = {
     /*data: function () {
         return {
@@ -163,30 +179,35 @@ const BwLogPanel = {
 const main = new Vue({
     el: "#main",
     data: {
-        bwPanelData: {
-            multiBwInstanceId: {
-                enabled: false,
-                id: "multiBwInstanceId" + Date.now(),
-                inputs: [],
-                label: 'BW Instance Id'
-            },
-            multiOrderId: {
-                enabled: false,
-                id: "multiOrderId" + Date.now(),
-                inputs: [],
-                label: 'Order Id'
-            },
-            multiEngineName: {
-                enabled: false,
-                id: "multiEngineName" + Date.now(),
-                inputs: [],
-                label: 'Engine Name'
-            }
+        panels: {
+            bwPanels: [{
+                id: Date.now(),
+                panelData: {
+                    multiBwInstanceId: {
+                        enabled: false,
+                        id: "multiBwInstanceId" + Date.now(),
+                        inputs: [],
+                        label: 'BW Instance Id'
+                    },
+                    multiOrderId: {
+                        enabled: false,
+                        id: "multiOrderId" + Date.now(),
+                        inputs: [],
+                        label: 'Order Id'
+                    },
+                    multiEngineName: {
+                        enabled: false,
+                        id: "multiEngineName" + Date.now(),
+                        inputs: [],
+                        label: 'Engine Name'
+                    }
+                }
+            }]
         },
         result: ''
     },
     components: {
-        'BwFieldPanel': BwFieldPanel,
+        'MainPanel': MainPanel,
         'BwLogPanel': BwLogPanel
     }
 })
