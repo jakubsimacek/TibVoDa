@@ -1,3 +1,17 @@
+/*
+
+main-panel
+    oth-field-panel* ...
+    bw-field-panel*         multiple ORs
+        multi-input         various fields
+            text-input*     mutliple ORs
+    bw-controls
+        bw-log-settings
+        time-panel
+        table
+
+
+*/
 //const bus = new Vue()
 
 const TextInput = {
@@ -137,32 +151,29 @@ const BwFieldPanel = {
     </div>`
 }
 
-const MainPanel = {
-    props: [ "panels" ],
-    components: {
-        'BwFieldPanel': BwFieldPanel
-    },
-    template: `
-    <div>
-        <ul>
-            <li v-for="bwPanel in panels.bwPanels" :key="bwPanel.id">
-                <bw-field-panel :panel-data="bwPanel.panelData" ></bw-field-panel>
-            </li>
-        </ul>
-    </div>`
-}
-
-const BwLogPanel = {
-    /*data: function () {
+const BwControls = {
+    data: function () {
         return {
-            count: 0
+            sql: ''
         }
-    },*/
+    },
     //props: [ "field" ],
     methods: {
         submit: function() {
-            const inputs = this.$parent.inputs
-            this.$parent.result = inputs.map(f => f.text).join(',')
+            console.log('submit clicked')
+            const _bwPanels = this.$parent.panels.bwPanels
+            const _bw = _bwPanels.map(bwp => {
+                console.log('outer')
+                const _bwinst = bwp.panelData.multiBwInstanceId.inputs.map((input, idx) => {
+                    console.log('inner')
+                    const _frag = "bwinstanceid ..." + input.text
+                    return ((idx > 1) ? 'OR ' : '') + _frag
+                }).join('')
+                return _bwinst
+            }).join('')
+            //sql = inputs.map(f => f.text).join(',')
+            console.log(_bw)
+            this.sql = _bw
         }
     },
     template: `
@@ -172,6 +183,24 @@ const BwLogPanel = {
                 <input type="submit" name="bwlog_panel_button" @click="submit">
             </label>
         </span>
+        {{ sql }}
+    </div>`
+}
+
+const MainPanel = {
+    props: [ "panels" ],
+    components: {
+        'BwFieldPanel': BwFieldPanel,
+        'BwControls': BwControls
+    },
+    template: `
+    <div>
+        <ul>
+            <li v-for="bwPanel in panels.bwPanels" :key="bwPanel.id">
+                <bw-field-panel :panel-data="bwPanel.panelData" ></bw-field-panel>
+            </li>
+            <bw-controls v-show="panels.bwPanels.length > 0"></bw-controls>
+        </ul>
     </div>`
 }
 
@@ -208,7 +237,6 @@ const main = new Vue({
     },
     components: {
         'MainPanel': MainPanel,
-        'BwLogPanel': BwLogPanel
     }
 })
 
