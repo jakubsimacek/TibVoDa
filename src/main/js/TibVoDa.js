@@ -120,11 +120,20 @@ const BwFieldPanel = {
 
         }
     },
+    computed: {
+        activeFields: function() {
+            return panelData.filter(i => i.enabled == true)
+        }
+    },
     template: `
     <div>
         <span>
             <button @click="add">Add OR</button>
-            <label :for="panelData.multiBwInstanceId.id">
+            <label :v-for="multiField in panelData" :for="multiField.id">
+                <!--input type="checkbox" :name="multiField.id" v-model="multiField.enabled">
+                {{ multiField.label }}-->
+            </label>
+            <!--label :for="panelData.multiBwInstanceId.id">
                 <input type="checkbox" :name="panelData.multiBwInstanceId.id" v-model="panelData.multiBwInstanceId.enabled">
                 Bw Instance Id
             </label>
@@ -135,10 +144,13 @@ const BwFieldPanel = {
             <label :for="panelData.multiEngineName.id">
                 <input type="checkbox" :id="panelData.multiEngineName.id" v-model="panelData.multiEngineName.enabled">
                 Engine name
-            </label>
+            </label-->
         </span>
         <ul>
-            <li v-if="panelData.multiBwInstanceId.enabled" :key="panelData.multiBwInstanceId.id">
+            <!--li v-for="multiField in activeFields" :key="multiField.id">
+                <multi-input :multi-inputs="multiField" ></multi-input>
+            </li-->
+            <!--li v-if="panelData.multiBwInstanceId.enabled" :key="panelData.multiBwInstanceId.id">
                 <multi-input :multi-inputs="panelData.multiBwInstanceId" ></multi-input>
             </li>
             <li v-if="panelData.multiOrderId.enabled" :key="panelData.multiOrderId.id">
@@ -146,7 +158,7 @@ const BwFieldPanel = {
             </li>
             <li v-if="panelData.multiEngineName.enabled" :key="panelData.multiEngineName.id">
                 <multi-input :multi-inputs="panelData.multiEngineName" ></multi-input>
-            </li>
+            </li-->
         </ul>
     </div>`
 }
@@ -211,26 +223,30 @@ const main = new Vue({
         panels: {
             bwPanels: [{
                 id: Date.now(),
-                panelData: {
-                    multiBwInstanceId: {
+                // multi.... -> multiField
+                panelData: [
+                    {
+                        field: 'BwInstanceId',
                         enabled: false,
-                        id: "multiBwInstanceId" + Date.now(),
+                        id: "multiBwInstanceId-" + Date.now(),
                         inputs: [],
                         label: 'BW Instance Id'
                     },
-                    multiOrderId: {
+                    {
+                        field: 'OrderId',
                         enabled: false,
-                        id: "multiOrderId" + Date.now(),
+                        id: "multiOrderId-" + Date.now(),
                         inputs: [],
                         label: 'Order Id'
                     },
-                    multiEngineName: {
+                    {
+                        field: 'EngineName',
                         enabled: false,
-                        id: "multiEngineName" + Date.now(),
+                        id: "multiEngineName-" + Date.now(),
                         inputs: [],
                         label: 'Engine Name'
                     }
-                }
+                ]
             }]
         },
         result: ''
